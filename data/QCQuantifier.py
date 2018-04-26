@@ -25,7 +25,7 @@ def pbsq(data, min_q_score=30, col_index="Lower Quartile"):
 
 
 def __score_pbsq_slope(current_data, prev_data):
-    return 1 / abs((current_data - prev_data) / 2 + 1)
+    return 1 / (abs((current_data - prev_data)) / 2 + 1)
 
 
 def psqs(data, min_required_score=30):
