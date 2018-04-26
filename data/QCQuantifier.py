@@ -38,7 +38,8 @@ def psqs(data, min_required_score=30):
     # Majority of reads should have q score above 30
     # We can calculate percent area above 30 vs total area
     # Get the cutoff by statistical analysis of all data and determine optimal percent cutoff value
-    return data[min_required_score:].sum() / data[:]['Count'].sum() * 100
+    sum = data[min_required_score:].sum().values[0]
+    return sum / data[:]['Count'].sum() * 100
 
 
 def pbsc(data):
@@ -73,13 +74,14 @@ def pbnc(data):
     # Closer to the front and back, higher the score
     # Spikes in the middle has lower score
     center_data_percentage = 70
-    center_data_range = (int((100 - 70) / 2), len(data) - int((100 - 70) / 2))
-
+    c_range_start = int((100 - center_data_percentage) / 2)
+    c_range_end = len(data) - int((100 - center_data_percentage) / 2)
     # ranges in beginning, middle and end range
     # TODO: figure out how to calculate __pbnc_score_ends and __pbnc_score_middle
-    return __pbnc_score_ends(data[0:center_data_range[0]]) + \
-           __pbnc_score_middle(data[center_data_percentage[0]:center_data_range[1]]) + \
-           __pbnc_score_ends(data[center_data_range[1]:])
+    score = __pbnc_score_ends(data[0:c_range_start]) + \
+           __pbnc_score_middle(data[c_range_start:c_range_end]) + \
+           __pbnc_score_ends(data[c_range_end:])
+    return score
 
 
 def __pbnc_score_ends(data_series):
