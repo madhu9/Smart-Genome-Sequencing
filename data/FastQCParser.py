@@ -55,4 +55,4 @@ class FastQCParser:
         name = line[0][2:3]
         for index in range(1, len(line)):
             name += line[index][0]
-        return name.upper()
+        return name.lower()
