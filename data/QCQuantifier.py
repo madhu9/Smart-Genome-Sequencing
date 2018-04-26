@@ -1,4 +1,4 @@
-def pbsq(data, min_q_score):
+def pbsq(data, min_q_score = 30, col_index="Lower Quartile"):
     """
     Score Per Base Sequence Quality from a Pandas Dataframe
     :param data: Pandas Dataframe containing PBSQ data
@@ -9,7 +9,24 @@ def pbsq(data, min_q_score):
     # if at least half way, plus some positive offset, module passes
     # Scoring System:
     # each base above 30, receives 1 / (abs(slope) + 1)
-    return None
+    base_above_q30 = 0
+    score = 0
+    for index in range(1, len(data)):
+        current_row = data.iloc[index]
+        prev_row = data.iloc[index - 1]
+        current_data = current_row[[col_index]]
+        current_data = current_data.values[0]
+        if current_data < min_q_score:
+            return score
+        prev_data = prev_row.loc[[col_index]]
+        prev_data = prev_data.values[0]
+        score += __score_pbsq(current_data, prev_data)
+        print(score)
+    return score
+
+
+def __score_pbsq(current_data, prev_data):
+    return 1 / abs((current_data - prev_data) / 2 + 1)
 
 
 def psqs(data, majoritiy_score):
