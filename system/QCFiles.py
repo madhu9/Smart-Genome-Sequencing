@@ -1,5 +1,5 @@
 import os
-from data.FastQCManager import FastQC
+from data.QCManager import FastQC
 
 
 def get_fastqc_array(dir):

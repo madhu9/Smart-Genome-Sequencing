@@ -1,4 +1,4 @@
-from data.FastQCParser import FastQCParser
+from data.QCParser import FastQCParser
 from data import QCQuantifier as score
 
 class FastQC:
