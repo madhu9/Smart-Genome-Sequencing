@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def pbsq(data, min_q_score=30, col_index="Lower Quartile"):
     """
     Score Per Base Sequence Quality from a Pandas Dataframe
@@ -49,9 +52,20 @@ def pbsc(data):
     :return: Score received by this module
     """
     # T and A should be very close
+    ta_percent_error = []
+    cg_percent_error = []
+    for index, row in data.iterrows():
+        expected_val = (row['T'] + row['A'])/2
+        ta_percent_error.append(__get_percent_error(row['T'], expected_val))
     # C and G should be very close
-    # T + A + C + G should be close to 100
-    return None
+        expected_val = (row['C'] + row['G'])/2
+        cg_percent_error.append(__get_percent_error(row['C'], expected_val))
+    return {"ta_error": np.array(ta_percent_error),
+            "cg_error": np.array(cg_percent_error)}
+
+
+def __get_percent_error(calc_val, expected_val):
+    return abs((expected_val - calc_val)/expected_val*100)
 
 
 def psgc(data):
@@ -61,7 +75,7 @@ def psgc(data):
     :return: Score of SPGC
     """
     # use machine learning
-    return None
+    return 0
 
 
 def pbnc(data):
