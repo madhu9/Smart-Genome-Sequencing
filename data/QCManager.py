@@ -6,6 +6,7 @@ import pandas as pd
 class FastQC:
     def __init__(self, file_loc):
         self.data = FastQCParser(file_loc)
+        self.file = self.data.modules['bs'].loc['Filename'].values[0]
         self.summary = dict()
         self.__quantify()
 
@@ -22,4 +23,16 @@ class FastQC:
 class FastQCDataPoint:
     def __init__(self, qc_array):
         self.qc_array = qc_array
-        self.summary = pd.DataFrame
+        index, summary = self.get_summary_report()
+        self.report = pd.DataFrame(summary, index=index)
+
+    def get_summary_report(self):
+        index = []
+        summary = []
+        for qc in self.qc_array:
+            summary.append(qc.summary)
+            index.append(qc.file)
+        return index, summary
+
+    def export_report(self, location):
+        self.report.to_csv(location)
