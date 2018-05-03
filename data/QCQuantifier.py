@@ -6,7 +6,7 @@ def pbsq(data, min_q_score=30, col_index="Lower Quartile"):
     Score Per Base Sequence Quality from a Pandas Dataframe
     :param data: Pandas Dataframe containing PBSQ data
     :param min_q_score: Minimum Q score cut-off
-    :return: A dictory of (above-min) and (score)
+    :return: A dictionary of (above-min) and (score)
     """
     # Look at the very last possible where lower quartile is above 30
     # if at least half way, plus some positive offset, module passes

@@ -11,9 +11,9 @@ def extract_qc_zip(zip_path, files, new_path):
     """
     identity = zip_path[zip_path.rfind('\\')+1: -4]
     file_loc = identity + "/"
-    with ZipFile(zip_path) as myzip:
+    with ZipFile(zip_path) as my_zip:
         for file in files:
-            myzip.extract(file_loc + file, path=new_path)
+            my_zip.extract(file_loc + file, path=new_path)
             os.rename(new_path+"/"+identity+"/"+file, new_path+"/"+identity+file[file.rfind("."):])
         os.removedirs(new_path+"/"+identity)
 
