@@ -1,5 +1,6 @@
 import os
 from data.QCManager import FastQC
+from data.QCManager import FastQCDataPoint
 
 
 def get_fastqc_array(dir):
@@ -12,5 +13,7 @@ def get_fastqc_array(dir):
 
 qc = get_fastqc_array("C:\\Users\\shikd\\Google Drive\\ByteSize\\20170712\\extracted")
 
-for qc in qc:
-    print(qc.summary)
+qc_list = FastQCDataPoint(qc)
+
+print(qc_list.report)
+qc_list.report.to_csv("extracted.csv")
