@@ -6,13 +6,13 @@ def pbsq(data, min_q_score=30, col_index="Lower Quartile"):
     Score Per Base Sequence Quality from a Pandas Dataframe
     :param data: Pandas Dataframe containing PBSQ data
     :param min_q_score: Minimum Q score cut-off
-    :return: Score of the PBSQ module
+    :return: A dictory of (above-min) and (score)
     """
     # Look at the very last possible where lower quartile is above 30
     # if at least half way, plus some positive offset, module passes
     # Scoring System:
     # each base above 30, receives 1 / (abs(slope) + 1)
-    base_above_q30 = 0
+    base_above_min = 0
     score = 0
     for index in range(1, len(data)):
         current_row = data.iloc[index]
@@ -20,11 +20,14 @@ def pbsq(data, min_q_score=30, col_index="Lower Quartile"):
         current_data = current_row[[col_index]]
         current_data = current_data.values[0]
         if current_data < min_q_score:
-            return score
+            return {"percent-above-min": base_above_min/len(data)*100,
+                    "score": score}
         prev_data = prev_row.loc[[col_index]]
         prev_data = prev_data.values[0]
         score += __score_pbsq_slope(current_data, prev_data)
-    return score
+        base_above_min += 1
+    return {"percent-above-min": base_above_min/len(data)*100,
+            "score": score}
 
 
 def __score_pbsq_slope(current_data, prev_data):
@@ -57,11 +60,18 @@ def pbsc(data):
     for index, row in data.iterrows():
         expected_val = (row['T'] + row['A'])/2
         ta_percent_error.append(__get_percent_error(row['T'], expected_val))
-    # C and G should be very close
+        # C and G should be very close
         expected_val = (row['C'] + row['G'])/2
         cg_percent_error.append(__get_percent_error(row['C'], expected_val))
-    return {"ta_error": np.array(ta_percent_error),
-            "cg_error": np.array(cg_percent_error)}
+    ta_percent_error = np.array(ta_percent_error)
+    cg_percent_error = np.array(cg_percent_error)
+    ta_mean_error = ta_percent_error.mean()
+    cg_mean_error = cg_percent_error.mean()
+    return {"ta_error": ta_percent_error,
+            "ta_mean_error": ta_percent_error,
+            "cg_error": cg_percent_error,
+            "cg_mean_error": cg_mean_error,
+            "avg_error": (ta_mean_error + cg_mean_error)/2}
 
 
 def __get_percent_error(calc_val, expected_val):
@@ -72,7 +82,7 @@ def psgc(data):
     """
     Per Sequence GC content
     :param data: PSGC Pandas DataFrame
-    :return: Score of SPGC
+    :return: Score of PSGC
     """
     # use machine learning
     return 0
@@ -84,17 +94,22 @@ def pbnc(data):
     :param data: Pandas Dataframe of PBNC
     :return: PBNC Score
     """
+    score = 0
     # Area should be as close to 0 as possible
     # Closer to the front and back, higher the score
     # Spikes in the middle has lower score
-    center_data_percentage = 70
-    c_range_start = int((100 - center_data_percentage) / 2)
-    c_range_end = len(data) - int((100 - center_data_percentage) / 2)
-    # ranges in beginning, middle and end range
-    # TODO: figure out how to calculate __pbnc_score_ends and __pbnc_score_middle
-    score = __pbnc_score_ends(data[0:c_range_start]) + \
-           __pbnc_score_middle(data[c_range_start:c_range_end]) + \
-           __pbnc_score_ends(data[c_range_end:])
+    # TODO: Implement this part
+    # center_data_percentage = 70
+    # c_range_start = int((100 - center_data_percentage) / 2)
+    # c_range_end = len(data) - int((100 - center_data_percentage) / 2)
+    # Ranges in beginning, middle and end range
+    # score = __pbnc_score_ends(data[0:c_range_start]) + \
+    #        __pbnc_score_middle(data[c_range_start:c_range_end]) + \
+    #        __pbnc_score_ends(data[c_range_end:])
+    for index in range(len(data)):
+        # TODO: Check through all data and make sure it's below 0
+        if data.iloc[index].values[0] > 0:
+            score += 1
     return score
 
 
@@ -113,13 +128,13 @@ def sld(data):
     Score SLD
     :param data: Pandas Dataframe of SLD
     :param percent_same_length: What percentage of length distribution should be the same length
-    :return: Score (Mode Length, Percentage of data of this length)
+    :return: Score Percentage of data of this length
     """
     # Most point should be the same length
     # Can be parsed from fastqc file
     mode = data['Count'].max()
     total = data['Count'].sum()
-    return mode, mode/total*100
+    return mode/total*100
 
 
 def ac(data):
