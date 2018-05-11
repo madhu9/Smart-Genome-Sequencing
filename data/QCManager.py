@@ -1,14 +1,16 @@
 from data.QCParser import FastQCParser
 from data import QCQuantifier as score
 import pandas as pd
+import os
 
 
 class FastQC:
     def __init__(self, file_loc):
-        self.data = FastQCParser(file_loc)
-        self.file = self.data.modules['bs'].loc['Filename'].values[0]
-        self.summary = dict()
-        self.__quantify()
+        if os.path.exists(file_loc):
+            self.data = FastQCParser(file_loc)
+            self.file = self.data.modules['bs'].loc['Filename'].values[0]
+            self.summary = dict()
+            self.__quantify()
 
     def __quantify(self):
         self.summary["pbsq"] = score.pbsq(self.data.modules["pbsq"])['score']
@@ -18,6 +20,13 @@ class FastQC:
         self.summary["pbnc"] = score.pbnc(self.data.modules["pbnc"])
         self.summary["sld"] = score.sld(self.data.modules["sld"])
         self.summary["ac"] = score.ac(self.data.modules["ac"])
+
+
+class FastQCPair:
+    def __init__(self, forward, reverse):
+        self.forward = forward
+        self.reverse = reverse
+        # TODO: Figure out how these two files relates to each other
 
 
 class FastQCDataPoint:
