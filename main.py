@@ -1,5 +1,5 @@
 from data.QCManager import FastQCDataPoint
-import system.QCFiles as files
+import system.QCFileManager as files
 
 
 qc_loc = "C:\\Users\\shikd\\Google Drive\\ByteSize\\20170712\\extracted"
