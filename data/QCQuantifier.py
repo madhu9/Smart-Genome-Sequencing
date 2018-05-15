@@ -84,7 +84,7 @@ def psgc(data):
     :param data: PSGC Pandas DataFrame
     :return: Score of PSGC
     """
-    # use machine learning
+    # TODO: use machine learning
     return 0
 
 
@@ -98,7 +98,7 @@ def pbnc(data):
     # Area should be as close to 0 as possible
     # Closer to the front and back, higher the score
     # Spikes in the middle has lower score
-    # TODO: Implement this part
+    # TODO: Use different calculation for different part of the graph
     # center_data_percentage = 70
     # c_range_start = int((100 - center_data_percentage) / 2)
     # c_range_end = len(data) - int((100 - center_data_percentage) / 2)
@@ -127,13 +127,13 @@ def sld(data):
     """
     Score SLD
     :param data: Pandas Dataframe of SLD
-    :param percent_same_length: What percentage of length distribution should be the same length
-    :return: Score Percentage of data of this length
+    :return: Percentage of data of this length
     """
     # Most point should be the same length
     # Can be parsed from fastqc file
     mode = data['Count'].max()
     total = data['Count'].sum()
+    # TODO: Return which length it is as well as the percent distribution
     return mode/total*100
 
 
