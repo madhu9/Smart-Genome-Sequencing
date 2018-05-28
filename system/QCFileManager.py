@@ -1,6 +1,6 @@
 import os
 from data.QCManager import FastQC
-from data.QCManager import  FastQCPair
+from data.QCManager import FastQCPair
 
 
 def get_fastqc_pair_dict(dir):
@@ -13,7 +13,7 @@ def get_fastqc_pair_dict(dir):
     unique_qc = __get_unique_qc(dir)
     for qc in unique_qc:
         forward, reverse = __get_fastqc_pair(qc)
-        qc_pair[qc[qc.rindex('\\')+1:]] = FastQCPair(forward, reverse)
+        qc_pair[qc[qc.rindex('\\') + 1:]] = FastQCPair(forward, reverse)
     return qc_pair
 
 
@@ -65,3 +65,31 @@ def __get_fastqc_pair(unique_qc_name):
     forward_qc = FastQC(forward) if os.path.exists(forward) else None
     reverse_qc = FastQC(reverse) if os.path.exists(forward) else None
     return forward_qc, reverse_qc
+
+
+def extract_results(file_loc):
+    return None
+
+
+class ReportDatabase:
+    def __init__(self, file_loc):
+        self.file_loc = file_loc
+
+    @staticmethod
+    def __create_entry_id(entry):
+        """
+        Given a database entry with WGSID, MiSeq and Date, extract the filename prefix for entry
+        :return:
+        """
+        try:
+            file = entry['WGSID'] + '-NYC-' + entry['MISeq'] + '-' + ReportDatabase.__get_reformatted_date(entry['Date'])
+        except AttributeError:
+            print("Missing Data")
+        return file
+
+    @staticmethod
+    def __get_reformatted_date(date):
+        date = date.split('/')
+        if date[0] == 1:
+            date[0] = '0' + date[0]
+        return date[2] + date[0] + date[1]
