@@ -5,16 +5,20 @@ import os
 
 
 class FastQC:
-    def __init__(self, file_loc):
+    def __init__(self, file_loc, database):
         """
         Creates a FastQC Object
         :param file_loc: File Location of where the FastQC.txt file is stored
         """
-        if os.path.exists(file_loc):
+        try:
             self.data = FastQCParser(file_loc)
             self.file = self.data.modules['bs'].loc['Filename'].values[0]
+            self.result = self.__get_sequence_result(database)
             self.summary = dict()
             self.__quantify()
+        except FileNotFoundError:
+            # TODO: Handle case for when file doesn't exists
+            print("File doesn't exists")
 
     def __quantify(self):
         """
@@ -30,6 +34,25 @@ class FastQC:
         self.summary["sld"] = score.sld(self.data.modules["sld"])
         self.summary["ac"] = score.ac(self.data.modules["ac"])
         # TODO: Create an index for final outcome of the sequence
+
+    def __get_sequence_result(self, database):
+        """
+        Given a database of QC results, extract current SQ result
+        :param database: Pandas df which must contain WGSID, MISeq, and Date headers
+        :return: Result stored in database for current sequence
+        """
+        filename = self.file[:self.file.index('_')].split('-')
+        key_values = {
+            'WGSID': filename[0],
+            'MISeq': filename[2],
+            'Date': filename[3]
+        }
+        entry = database
+        for key, value in key_values.items():
+            entry = entry[entry[key] == key_values[key]]
+            if len(entry) == 1:
+                break
+        return entry['LocResult'].values[0], entry['CDCResult'].values[0]
 
 
 class FastQCPair:
